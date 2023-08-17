@@ -2,33 +2,24 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"net/http"
-	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	app := fiber.New(fiber.Config{
-		AppName: "ec-webhook-sandbox",
-	})
+	r := gin.New()
+	r.POST("/webhook/ec-notification", func(c *gin.Context) {
 
-	webhookGroup := app.Group("/webhook")
-	webhookGroup.Post("/ec-notification", func(ctx *fiber.Ctx) error {
-		r := ctx.Request()
-		res := ctx.Response()
-
-		var payload map[string]interface{}
-		unMarshalErr := json.Unmarshal(r.Body(), &payload)
-		if unMarshalErr != nil {
-			return unMarshalErr
+		var notification map[string]interface{}
+		if decodeErr := json.NewDecoder(c.Request.Body).Decode(&notification); decodeErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "invalid request body",
+			})
 		}
-
-		fmt.Println("webhook payload", payload)
-		res.SetStatusCode(http.StatusOK)
-		return nil
+		c.JSON(http.StatusOK, gin.H{
+			"notification-data": notification,
+		})
 	})
-
-	_ = app.Listen(os.Getenv("PORT"))
-
+	_ = r.Run()
 }
