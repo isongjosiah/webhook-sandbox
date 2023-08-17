@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,7 @@ func main() {
 				"error": "invalid request body",
 			})
 		}
+		fmt.Println("notification-date: ", notification)
 		c.JSON(http.StatusOK, gin.H{
 			"notification-data": notification,
 		})
