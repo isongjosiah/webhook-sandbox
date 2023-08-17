@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -27,4 +28,7 @@ func main() {
 		res.SetStatusCode(http.StatusOK)
 		return nil
 	})
+
+	_ = app.Listen(os.Getenv("PORT"))
+
 }
